@@ -2,6 +2,8 @@
 import csv
 import os
 import datetime
+import pandas as pd
+import matplotlib.pyplot as plt
 
 class Persona:
     def __init__(self,nombre,apellido,edad) -> None:
@@ -10,6 +12,7 @@ class Persona:
         self.edad=edad
 
 class Integrante(Persona):
+    roles_integrantes=['Padre','Madre','Hijo','Hija']
     def __init__(self, nombre, apellido, edad,integrante) -> None:
         super().__init__(nombre, apellido, edad)
         self.integrante=integrante
@@ -17,7 +20,7 @@ class Integrante(Persona):
     def reistro_Integrante(self):
         while True:
             try:
-                self.nombre=input('Ingrese el nombre del miemrbo: ').strip()
+                self.nombre=input('Ingrese el nombre del miemrbo: ').strip().capitalize()
                 if self.nombre.isalpha():
                     break
                 else:
@@ -26,7 +29,7 @@ class Integrante(Persona):
                 print('No puede dejar el campo en blanco solo puede ingresar letras')
         while True:
             try:
-                self.apellido=input("Ingrese el apellido del cliente: ")
+                self.apellido=input("Ingrese el apellido del cliente: ").strip().capitalize()
                 if self.apellido.isalpha():
                     break
                 else:
@@ -44,8 +47,8 @@ class Integrante(Persona):
                 print('La edad no puede ser 0 o menor a cero, tampoco puede ingresar letras o dejar el campo en blanco')
         while True:
             try:
-                self.integrante=input('Ingrese el rol que desea asignarle a esta persona: ')
-                if self.integrante.isalpha():
+                self.integrante=input('Ingrese el rol que desea asignarle a esta persona: ').strip().capitalize()
+                if self.integrante.isalpha() and self.integrante in Integrante.leer_Integrantes:
                     break
                 else:
                     raise ValueError
@@ -71,7 +74,7 @@ class Presupuesto:
         self.presupuesto_mensaul=presupuesto_mensual
         self.arhivo_presupuesto='Presupuesto.csv'
     
-    def registrar_Presupuesto(self): #agregar quien cambia presupuesto
+    def registrar_Presupuesto(self): 
         presuesto_actual=0
 
         if os.path.exists(self.arhivo_presupuesto):
@@ -95,17 +98,20 @@ class Categoria:
     def __init__(self,categoria) -> None:
         self.categoria=categoria
 
-    def registrar_categoria(self):
-
+    @classmethod
+    def leer_categorias(cls):
+        cls.lista_categorias.clear()
         with open('Categorias.csv', mode="r") as archivoLecturaCSV:
             reader = csv.reader(archivoLecturaCSV, delimiter=",")
             next(reader)  
             for fila in reader:
                 Categoria.lista_categorias.append(fila[0])
 
+    def registrar_categoria(self):
+        self.leer_categorias()
         while True:
             try:
-                self.categoria=input('Ingrese la categoria que desea agregar').capitalize()
+                self.categoria=input('Ingrese la categoria que desea agregar: ').capitalize()
                 if not self.categoria:
                     raise ValueError
                 if self.categoria in Categoria.lista_categorias:
@@ -121,13 +127,33 @@ class Categoria:
 
 class Gastos(Categoria):
     
-    def __init__(self,monto,fecha,categoria,integrante) -> None:
+    def __init__(self,monto,fecha,categoria,integrante):
         super().__init__(categoria)
         self.monto=monto
         self.fecha=fecha
-        self.integegrante=integrante
+        self.integrante=integrante
+        self.leer_categorias()
 
     def registro_Gasto(self):
+
+        print(",".join(Categoria.lista_categorias))
+
+        while True:
+            try:
+                self.categoria=input('Ingrese la categoria del Gasto').strip().capitalize()
+                if self.categoria in Categoria.lista_categorias:
+                    break
+                else:
+                    self.categoria not in Categoria.lista_categorias
+                    print('La categoria seleccionada no esta registrada')
+                    nuevo_registro=input('Desea registrar una nueva Categoria? Si/No').upper()
+                    if nuevo_registro=="SI":
+                        Categoria.registrar_categoria(self)
+                        self.leer_categorias()
+                    else:
+                        break
+            except ValueError:
+                print('La categoria seleccionada no esta registrada')
         
         while True:
             try:
@@ -138,23 +164,30 @@ class Gastos(Categoria):
                     raise ValueError
             except ValueError:
                 print('No puede ingresar numeros negativos ni letras')
+
         while True:
+            meses=['Ene','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
             try:
-                self.fecha=input('Ingrese el mes del Gasto en formato de tres letras: ')
+                self.fecha=input('Ingrese el mes del Gasto en formato de tres letras: ').capitalize()
                 largo=len(self.fecha)
-                if largo >3:
-                    print('Ese formato de mes no es valido')
+                if largo !=3 or not self.fecha.isalpha() or self.fecha not in meses:
+                    raise ValueError
                 else:
                     break
             except ValueError:
-                print('No puede ingresar numeros')
+                print('Solo puede ingresar letras y no puede dejar el cmapo en blanco')
+
         while True:
             try:
-                self.lista_categorias
-                nuevo_gasto=input(f'Seleccion la categoria de gasto{Categoria.lista_categorias}')## ver porque no llama a la lista debeo instanciarlo?
+                self.integrante=input('Que integreante realizo el gasto?').capitalize()
                 break
             except ValueError:
                 print('Esa no es una cateogria valida')
+                
+        with open("Gastos.csv",mode="a",newline="") as archivoCSV:
+            writer=csv.writer(archivoCSV,delimiter=",")
+            writer.writerow([self.fecha,self.categoria,self.monto,self.integrante])
+        
 class Sistema_Presupuesto:
 
     def __init__(self) -> None:
@@ -173,7 +206,7 @@ class Sistema_Presupuesto:
         if not os.path.exists(self.arhivo_gastos):
             with open("Gastos.csv",mode="w",newline="") as archivoCSV:
                 writer=csv.writer(archivoCSV,delimiter=",")
-                writer.writerow(['Fecha','Categoria','Total Gastado','integrante'])
+                writer.writerow(['Fecha','Categoria','Total Gastado','Integrante'])
 
     def creacion_archivo_integrantes(self):
         if not os.path.exists(self.archivo_integrantes):
@@ -181,12 +214,48 @@ class Sistema_Presupuesto:
                 writer=csv.writer(archivoCSV,delimiter=",")
                 writer.writerow(['Nombre','Edad','Integrante'])
 
-    
     def creacion_archivo_Categorias(self):
         if not os.path.exists(self.archivo_categorias):
             with open("Categorias.csv",mode="w",newline="") as archivoCSV:
                 writer=csv.writer(archivoCSV,delimiter=",")
                 writer.writerow(['Categoria'])
+
+    def resumen_gastos(self):
+        while True:
+            try:
+                tipo=input('Desea ver el resumen por Fecha o por Integrante?').capitalize()
+                df= pd.read_csv('Gastos.csv')
+                plt.style.use('ggplot')
+                if tipo=="Fecha":
+                    resumen= pd.DataFrame(df.groupby(['Fecha','Categoria'])['Total Gastado'].sum())
+                    tabla=resumen.pivot_table(index=['Fecha'],columns='Categoria', values='Total Gastado', aggfunc='sum')
+                    tabla.plot.bar(figsize=(10,10))
+                    plt.title('Resumen Gastos por Fecha')
+                    plt.xlabel('Fecha')
+                    plt.ylabel('Total Gastado')
+                    plt.xticks(rotation=45)
+                    plt.tight_layout()
+                    plt.legend(title='Categoria')
+                    plt.show()
+                    break
+                if tipo=="Integrante":
+                    resumen= pd.DataFrame(df.groupby(['Integrante','Categoria'])['Total Gastado'].sum())
+                    tabla=resumen.pivot_table(index=['Integrante'],columns='Categoria', values='Total Gastado', aggfunc='sum')
+                    tabla.plot.bar(figsize=(10,10))
+                    plt.title('Resumen Gastos por Integrante')
+                    plt.xlabel('Integrante')
+                    plt.ylabel('Total Gastado')
+                    plt.xticks(rotation=45)
+                    plt.tight_layout()
+                    plt.legend(title='Categoria')
+                    plt.show()
+                    break
+                else:
+                    raise ValueError
+            except ValueError:
+                print('Esa no es una opcion valida')
+    
+
 
     print('Bienvenido a su sistema de Presupuesto Mensual')
  
@@ -234,7 +303,9 @@ class Sistema_Presupuesto:
                 categoria1=Categoria("")
                 categoria1.registrar_categoria()
             if opcion==6:
-                pass
+                sistemaPresupuesto.resumen_gastos()
+
+
             salir=input('Desea salir del programa de presuspuesto Si/No?').upper()
 
 
