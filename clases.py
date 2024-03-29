@@ -255,7 +255,23 @@ class Sistema_Presupuesto:
             except ValueError:
                 print('Esa no es una opcion valida')
     
+    def restante_presupuesto(self):
+        presupuesto_actual=0
+        with open("Presupuesto.csv", mode="r") as archivoCSV:
+            reader = csv.reader(archivoCSV, delimiter=",")
+            next(reader)
+            for fila in reader:
+                presupuesto_actual = float(fila[0])
 
+        df_gastos= pd.read_csv('Gastos.csv')
+        total_gastado= df_gastos['Total Gastado'].sum()
+        resulatdo=presupuesto_actual-total_gastado
+
+        if resulatdo>0:
+            print(f'El presuesto restante es de \033[92m{resulatdo} esta dentro del presupuesto')
+        if resulatdo<0:
+            print(f'El presupuesto restante es de \033[0;31m {resulatdo} esta por encima del presupuesto')
+        
 
     print('Bienvenido a su sistema de Presupuesto Mensual')
  
@@ -265,16 +281,17 @@ class Sistema_Presupuesto:
         self.creacion_archivo_Categorias()
         self.creacion_archivo_Gastos()
 
-        lista_opciones=[1,2,3,4,5,6]
+        lista_opciones=[1,2,3,4,5,6,7]
         salir="NO"
         while salir=="NO":
-            print('''Seleccione que desear realizar hoy
+            print('''\033[0;37mSeleccione que desear realizar hoy
                 1) Definir Presupuesto
                 2) Ingresar un nuevo integrante
                 3) Consultar integrantes Actuales
                 4) Ingresar un nuevo gasto
                 5) Ingresar una nueva categoria de gasto
-                6) Mostrar resumen de gastos
+                6) Mostrar Graficos de gastos
+                7) Consultar presupuesto restante
                 ''')
 
             while True:
@@ -304,9 +321,11 @@ class Sistema_Presupuesto:
                 categoria1.registrar_categoria()
             if opcion==6:
                 sistemaPresupuesto.resumen_gastos()
+            if opcion==7:
+                sistemaPresupuesto.restante_presupuesto()
 
 
-            salir=input('Desea salir del programa de presuspuesto Si/No?').upper()
+            salir=input('\033[0;37mDesea salir del programa de presuspuesto Si/No?').upper()
 
 
 
