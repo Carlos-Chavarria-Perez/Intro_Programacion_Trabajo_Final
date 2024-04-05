@@ -1,6 +1,6 @@
 # Intro_Programacion_Trabajo_Final
 
-# Codigo Presuspuesto
+
 ## Como hacer check out para este proyecto GIT
 
 ## Como hacer commit
