@@ -5,18 +5,17 @@ import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
+#separar clases por archivo
 class Persona:
-    def __init__(self,nombre,apellido,edad) -> None:
+    roles_integrantes=['Padre','Madre','Hijo','Hija']
+    def __init__(self,nombre,apellido,edad,integrante) -> None:
         self.nombre=nombre
         self.apellido= apellido
         self.edad=edad
-
-class Integrante(Persona):
-    roles_integrantes=['Padre','Madre','Hijo','Hija']
-    def __init__(self, nombre, apellido, edad,integrante) -> None:
-        super().__init__(nombre, apellido, edad)
         self.integrante=integrante
-    
+        self.lista_roles_validacion=[]
+
     def reistro_Integrante(self):
         while True:
             try:
@@ -47,13 +46,21 @@ class Integrante(Persona):
                 print('La edad no puede ser 0 o menor a cero, tampoco puede ingresar letras o dejar el campo en blanco')
         while True:
             try:
+                with open('Integrantes.csv', mode="r") as archivoLecturaCSV:
+                    reader = csv.reader(archivoLecturaCSV, delimiter=",")
+                    next(reader)  
+                    for fila in reader:
+                        self.lista_roles_validacion.append(fila[-1])
+
                 self.integrante=input('Ingrese el rol que desea asignarle a esta persona: ').strip().capitalize()
-                if self.integrante.isalpha() and self.integrante in Integrante.leer_Integrantes:
+                if self.integrante.isalpha() and self.integrante in Persona.roles_integrantes\
+                      and (self.integrante !='Padre' or "Padre" not in self.lista_roles_validacion)\
+                        and (self.integrante !='Madre' or "Madre" not in self.lista_roles_validacion): 
                     break
                 else:
                     raise ValueError
             except ValueError:
-                print('No puede dejar el campo en blanco solo puede ingresar letras')
+                print('El rol que intenta no es una opcion disponible, o el role ya esta asignado')
         
         with open("Integrantes.csv",mode="a",newline="") as archivoCSV:
                 writer=csv.writer(archivoCSV,delimiter=",")
@@ -67,14 +74,92 @@ class Integrante(Persona):
             for fila in reader:
                 for header_item,detalle in zip(header,fila):
                     print(f'{header_item}:{detalle}')
+                print()
 
+class Usuario(Persona):
+    lista_usuarios= []
+
+    def __init__(self,username,password,integrante):
+        super().__init__("","",0,integrante)
+        self.__username= username
+        self.__password= password
+
+    @property
+    def username(self):
+        return self.__username
+
+    @property
+    def password(self):
+        return self.__password
+
+    @username.setter
+    def username(self, value):
+        self.__username = value
+
+    @password.setter
+    def password(self, value):
+        self.__password = value
+
+
+    def registrar_usuario(self):
+
+        with open('Usuarios.csv', mode="r") as archivoLecturaCSV:
+            reader = csv.reader(archivoLecturaCSV, delimiter=",")
+            next(reader)  
+            for fila in reader:
+                Usuario.lista_usuarios.append(fila[0])
+ 
+        while True:
+            try:
+                self.__username= input('Define el usuario: ')
+                if self.__username in Usuario.lista_usuarios:
+                    raise ValueError
+                else:
+                    break
+            except ValueError:
+                print('Usuario ya existe')
+             
+        self.password= input('Defina su contraseña: ')
+
+        Persona.reistro_Integrante(self)
+
+    
+        with open("Usuarios.csv",mode="a",newline="") as archivoCSV:
+            writer=csv.writer(archivoCSV,delimiter=",")
+            writer.writerow([self.__username,self.__password,self.integrante])
+
+    def actualizar_password(self):
+        validador = input('Valide su contraseña Actual: ')
+        
+        # Read the data from the CSV file
+        with open("Usuarios.csv", mode="r") as archivoCSV:
+            reader = csv.reader(archivoCSV, delimiter=",")
+            rows = list(reader)  # Convert reader object to a list of rows
+
+        # Update the specific value based on user input
+        for fila in rows:
+            if fila[1] == validador:
+                nuevo_password = input('Defina su nueva contraseña: ')
+                fila[1] = nuevo_password
+                break
+
+        # Rewrite the entire CSV file with the updated data
+        with open("Usuarios.csv", mode="w", newline="") as archivoCSV:
+            writer = csv.writer(archivoCSV, delimiter=",")
+            writer.writerows(rows)
+
+        if any(fila[1] == nuevo_password for fila in rows):
+            print("Contraseña actualizada con éxito.")
+        else:
+            print("La contraseña actual no coincide con ningún usuario.")
+        
 
 class Presupuesto:
     def __init__(self,presupuesto_mensual) -> None:
         self.presupuesto_mensaul=presupuesto_mensual
         self.arhivo_presupuesto='Presupuesto.csv'
     
-    def registrar_Presupuesto(self): 
+    def registrar_Presupuesto(self,integrante): 
         presuesto_actual=0
 
         if os.path.exists(self.arhivo_presupuesto):
@@ -103,7 +188,11 @@ class Categoria:
         cls.lista_categorias.clear()
         with open('Categorias.csv', mode="r") as archivoLecturaCSV:
             reader = csv.reader(archivoLecturaCSV, delimiter=",")
-            next(reader)  
+            try:
+                next(reader)
+            except StopIteration:
+                print('El archivo esta vacio')
+
             for fila in reader:
                 Categoria.lista_categorias.append(fila[0])
 
@@ -116,8 +205,10 @@ class Categoria:
                     raise ValueError
                 if self.categoria in Categoria.lista_categorias:
                     print('La categoria ya existe, no puede duplicar categorias')
-                else:
+                if self.categoria.isalpha():
                     break
+                else:
+                    raise ValueError
             except ValueError:
                 print('No puede dejar este campo en blanco')
 
@@ -134,19 +225,20 @@ class Gastos(Categoria):
         self.integrante=integrante
         self.leer_categorias()
 
-    def registro_Gasto(self):
+    def registro_Gasto(self,usuario_actual):
 
+        print('Estas son las Categorias registradas actualmente')
         print(",".join(Categoria.lista_categorias))
 
         while True:
             try:
-                self.categoria=input('Ingrese la categoria del Gasto').strip().capitalize()
+                self.categoria=input('Ingrese la categoria del Gasto: ').strip().capitalize()
                 if self.categoria in Categoria.lista_categorias:
                     break
                 else:
                     self.categoria not in Categoria.lista_categorias
                     print('La categoria seleccionada no esta registrada')
-                    nuevo_registro=input('Desea registrar una nueva Categoria? Si/No').upper()
+                    nuevo_registro=input('Desea registrar una nueva Categoria? Si/No: ').upper()
                     if nuevo_registro=="SI":
                         Categoria.registrar_categoria(self)
                         self.leer_categorias()
@@ -166,7 +258,7 @@ class Gastos(Categoria):
                 print('No puede ingresar numeros negativos ni letras')
 
         while True:
-            meses=['Ene','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+            meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
             try:
                 self.fecha=input('Ingrese el mes del Gasto en formato de tres letras: ').capitalize()
                 largo=len(self.fecha)
@@ -175,15 +267,8 @@ class Gastos(Categoria):
                 else:
                     break
             except ValueError:
-                print('Solo puede ingresar letras y no puede dejar el cmapo en blanco')
+                print('Solo puede ingresar letras y no puede dejar el campo en blanco')
 
-        while True:
-            try:
-                self.integrante=input('Que integreante realizo el gasto?').capitalize()
-                break
-            except ValueError:
-                print('Esa no es una cateogria valida')
-                
         with open("Gastos.csv",mode="a",newline="") as archivoCSV:
             writer=csv.writer(archivoCSV,delimiter=",")
             writer.writerow([self.fecha,self.categoria,self.monto,self.integrante])
@@ -195,6 +280,8 @@ class Sistema_Presupuesto:
         self.archivo_integrantes='integrantes.csv'
         self.arhivo_gastos='Gastos.csv'
         self.archivo_categorias='Categorias.csv'
+        self.archivo_usuarios='Usuarios.csv'
+        self.usuario_actual = None
 
     def creacion_arvhivo_Presupuesto(self):
         if not os.path.exists(self.arhivo_presupuesto):
@@ -219,6 +306,12 @@ class Sistema_Presupuesto:
             with open("Categorias.csv",mode="w",newline="") as archivoCSV:
                 writer=csv.writer(archivoCSV,delimiter=",")
                 writer.writerow(['Categoria'])
+
+    def creacion_archivo_Usuarios(self):
+        if not os.path.exists(self.archivo_usuarios):
+            with open("Usuarios.csv",mode="w",newline="") as archivoCSV:
+                writer=csv.writer(archivoCSV,delimiter=",")
+                writer.writerow(['Usuario','Contraseña',"Integrante"])
 
     def resumen_gastos(self):
         while True:
@@ -274,62 +367,102 @@ class Sistema_Presupuesto:
         
 
     print('Bienvenido a su sistema de Presupuesto Mensual')
- 
+    
+    def login(self):
+        while True:
+
+            username = input("Ingrese Usuario: ")
+            password = input("Ingrese Contraseña: ")
+            usuario_encontrado= False
+
+            with open("Usuarios.csv", mode="r") as archivoCSV:
+                reader = csv.reader(archivoCSV, delimiter=",")
+                next(reader)  
+                for fila in reader:
+                    if fila[0] == username and fila[1] == password:
+                        integrante= fila[2]
+                        self.usuario_actual=Usuario(username,password,integrante)
+                        return True
+                    usuario_encontrado= True
+
+            if not usuario_encontrado:
+                print('No existen usuarios actualmente, por favor registre un usuario')
+                Usuario1=Usuario("","","")
+                Usuario1.registrar_usuario()    
+    
+            print("Usuario no valido o contraseña no válida. Inténtelo de nuevo.")
+            print()
+    
+
+
     def ejecutar(self):
         self.creacion_arvhivo_Presupuesto()
         self.creacion_archivo_integrantes()
         self.creacion_archivo_Categorias()
+        self.creacion_archivo_Usuarios()
         self.creacion_archivo_Gastos()
 
-        lista_opciones=[1,2,3,4,5,6,7]
+        if not self.login():
+            return 
+        
+        lista_opciones=[1,2,3,4,5,6,7,8]
+        
         salir="NO"
         while salir=="NO":
             print('''\033[0;37mSeleccione que desear realizar hoy
                 1) Definir Presupuesto
-                2) Ingresar un nuevo integrante
-                3) Consultar integrantes Actuales
-                4) Ingresar un nuevo gasto
-                5) Ingresar una nueva categoria de gasto
-                6) Mostrar Graficos de gastos
-                7) Consultar presupuesto restante
+                2) Consultar integrantes Actuales
+                3) Ingresar un nuevo gasto
+                4) Ingresar una nueva categoria de gasto
+                5) Mostrar Graficos de gastos
+                6) Consultar presupuesto restante
+                7) Registrar usuario
+                8) Actaulizar contaseña
                 ''')
 
             while True:
                 try:
-                    opcion=int(input('Eliga un opcion'))
+                    opcion=int(input('Eliga un opcion: '))
                     if opcion in lista_opciones:
                         break
                     else:
-                        print('La opcion seleccionada no es valida, vuelvalo a intentar')
+                        raise ValueError
                 except ValueError:
-                    print('Solo puede ingresar numeros')
+                    print('La opcion seleccionada no es valida, vuelvalo a intentar')
             
             if opcion==1:
-                presupuesto1=Presupuesto("")
-                presupuesto1.registrar_Presupuesto()
+                if self.usuario_actual.integrante not in ['Padre','Madre']:
+                    print('Solo Padre o Madre pueden actualizar el presupuesto')
+                else:
+                    presupuesto1=Presupuesto("")
+                    presupuesto1.registrar_Presupuesto(self.usuario_actual.integrante)
             if opcion==2:
-                integrante1=Integrante("","","","")
-                integrante1.reistro_Integrante()
+                persona1=Persona("","","","")
+                persona1.leer_Integrantes()
             if opcion==3:
-                integrante1=Integrante("","","","")
-                integrante1.leer_Integrantes()
+                gasto1=Gastos("","","",self.usuario_actual.integrante)
+                gasto1.registro_Gasto(self.usuario_actual.integrante)
+
             if opcion==4:
-                gasto1=Gastos("","","","")
-                gasto1.registro_Gasto()
-            if opcion==5:
-                categoria1=Categoria("")
+                categoria1=Categoria("",)
                 categoria1.registrar_categoria()
-            if opcion==6:
+            if opcion==5:
                 sistemaPresupuesto.resumen_gastos()
-            if opcion==7:
+            if opcion==6:
                 sistemaPresupuesto.restante_presupuesto()
+            if opcion==7:
+                if self.usuario_actual.integrante not in ['Padre','Madre']:
+                    print('Solo Padre o Madre pueden agregar Usuarios')
+                else:
+                    Usuario1=Usuario("","","")
+                    Usuario1.registrar_usuario()
+            if opcion==8:
+                Usuario1=Usuario("","","")
+                Usuario1.actualizar_password()
 
-
-            salir=input('\033[0;37mDesea salir del programa de presuspuesto Si/No?').upper()
+            salir=input('\033[0;37mDesea salir del programa de presuspuesto Si/No?: ').upper()
 
 
 
 sistemaPresupuesto = Sistema_Presupuesto()
 sistemaPresupuesto.ejecutar()
-
-print(Categoria.lista_categorias)
