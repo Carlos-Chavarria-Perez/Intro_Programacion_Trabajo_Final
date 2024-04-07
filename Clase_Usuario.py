@@ -53,6 +53,10 @@ class Usuario(Persona):
             writer=csv.writer(archivoCSV,delimiter=",")
             writer.writerow([self.__username,self.__password,self.integrante])
 
+    def eliminar_usuario():
+        usuario_eliminar= input('Ingrese el usuario que desea eliminar: ')
+
+
     def actualizar_password(self):
         validador = input('Valide su contraseña Actual: ')
         
