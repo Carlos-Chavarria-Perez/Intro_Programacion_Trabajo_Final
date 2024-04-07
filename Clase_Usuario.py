@@ -46,33 +46,66 @@ class Usuario(Persona):
              
         self.password= input('Defina su contraseña: ')
 
-        Persona.reistro_Integrante(self)
+        Persona.reistro_Integrante(self,self.username)
 
     
         with open("Usuarios.csv",mode="a",newline="") as archivoCSV:
             writer=csv.writer(archivoCSV,delimiter=",")
             writer.writerow([self.__username,self.__password,self.integrante])
 
-    def eliminar_usuario():
-        usuario_eliminar= input('Ingrese el usuario que desea eliminar: ')
+    def eliminar_usuario(self):
+        usuario_eliminar=input('Ingrese el Usuario que desea eliminar: ')
+        lista_usuarios=[]
+        lista_integrantes=[]
+        
+        ##Eliminacion de Archivo de Usuarios
+        with open("Usuarios.csv", mode="r") as archivoCSV:
+            reader = csv.reader(archivoCSV, delimiter=",")
+            header=next(reader)
+            for fila in reader:
+                if fila[0]!= usuario_eliminar:
+                    lista_usuarios.append(fila)
+
+
+        with open("Usuarios.csv", mode="w", newline="") as archivoCSV:
+            writer = csv.writer(archivoCSV, delimiter=",")
+            writer.writerow(header)
+            writer.writerows(lista_usuarios)
+
+        ##Eliminacion de Archivo de Integrantes
+        with open("Integrantes.csv", mode="r") as archivoCSV:
+            reader = csv.reader(archivoCSV, delimiter=",")
+            header=next(reader)
+            for fila in reader:
+                if fila[0]!= usuario_eliminar:
+                    lista_integrantes.append(fila)
+
+
+        with open("Integrantes.csv", mode="w", newline="") as archivoCSV:
+            writer = csv.writer(archivoCSV, delimiter=",")
+            writer.writerow(header)
+            writer.writerows(lista_integrantes)
+
+        print(f'El usuario {usuario_eliminar} ha sido removido de lista de usuarios y de integrantes')
+
+
 
 
     def actualizar_password(self):
         validador = input('Valide su contraseña Actual: ')
         
-        # Read the data from the CSV file
+
         with open("Usuarios.csv", mode="r") as archivoCSV:
             reader = csv.reader(archivoCSV, delimiter=",")
-            rows = list(reader)  # Convert reader object to a list of rows
+            rows = list(reader)  
 
-        # Update the specific value based on user input
         for fila in rows:
             if fila[1] == validador:
                 nuevo_password = input('Defina su nueva contraseña: ')
                 fila[1] = nuevo_password
                 break
 
-        # Rewrite the entire CSV file with the updated data
+    
         with open("Usuarios.csv", mode="w", newline="") as archivoCSV:
             writer = csv.writer(archivoCSV, delimiter=",")
             writer.writerows(rows)

@@ -39,7 +39,7 @@ class Sistema_Presupuesto:
         if not os.path.exists(self.archivo_integrantes):
             with open("Integrantes.csv",mode="w",newline="") as archivoCSV:
                 writer=csv.writer(archivoCSV,delimiter=",")
-                writer.writerow(['Nombre','Apellido','Edad','Integrante'])
+                writer.writerow(['Usuario','Nombre','Apellido','Edad','Integrante'])
 
     def creacion_archivo_Categorias(self):
         if not os.path.exists(self.archivo_categorias):
@@ -145,7 +145,7 @@ class Sistema_Presupuesto:
         if not self.login():
             return 
         
-        lista_opciones=[1,2,3,4,5,6,7,8]
+        lista_opciones=[1,2,3,4,5,6,7,8,9]
         
         salir="NO"
         while salir=="NO":
@@ -158,6 +158,7 @@ class Sistema_Presupuesto:
                 6) Consultar presupuesto restante
                 7) Registrar usuario
                 8) Actaulizar contaseña
+                9) Eliminar Usuario
                 ''')
 
             while True:
@@ -199,6 +200,21 @@ class Sistema_Presupuesto:
             if opcion==8:
                 Usuario1=Usuario("","","")
                 Usuario1.actualizar_password()
+            if opcion==9:
+                if self.usuario_actual.integrante not in ['Padre','Madre']:
+                    print('Solo Padre o Madre pueden eliminar Usuarios')
+                else:
+                    Usuario1=Usuario("","","")
+                    Usuario1.eliminar_usuario()
+            while True:
+                try:
+                    salir=input('\033[0;37mDesea salir del programa de presuspuesto Si/No?: ').upper()
+                    if salir.upper()=="SI" or salir.upper()=="NO":
+                        break
+                    else:
+                        raise ValueError
+                except:
+                    ValueError
+                    print('Esa no es una opcion valida')
 
-            salir=input('\033[0;37mDesea salir del programa de presuspuesto Si/No?: ').upper()
 
