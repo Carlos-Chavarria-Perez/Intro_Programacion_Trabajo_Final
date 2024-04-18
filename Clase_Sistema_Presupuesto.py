@@ -53,6 +53,7 @@ class Sistema_Presupuesto:
                 writer=csv.writer(archivoCSV,delimiter=",")
                 writer.writerow(['Usuario','Contraseña',"Integrante"])
 
+    #Uso de pandas y matplotlib para sumatoria de gastos y creacion de graficos
     def resumen_gastos(self):
         while True:
             try:
@@ -87,7 +88,7 @@ class Sistema_Presupuesto:
                     raise ValueError
             except ValueError:
                 print('Esa no es una opcion valida')
-    
+    #Calculo de presupuesto restante
     def restante_presupuesto(self):
         presupuesto_actual=0
         with open("Presupuesto.csv", mode="r") as archivoCSV:
@@ -108,6 +109,7 @@ class Sistema_Presupuesto:
 
     print('Bienvenido a su sistema de Presupuesto Mensual')
     
+    #Funcionalidad de Login
     def login(self):
         while True:
 
@@ -124,7 +126,7 @@ class Sistema_Presupuesto:
                         self.usuario_actual=Usuario(username,password,integrante)
                         return True
                     usuario_encontrado= True
-
+            #Funcionalidad de crear usuario cuando se ejecuta por primera ver el codigo no existen Usarios registrados
             if not usuario_encontrado:
                 print('No existen usuarios actualmente, por favor registre un usuario')
                 Usuario1=Usuario("","","")
@@ -136,6 +138,7 @@ class Sistema_Presupuesto:
 
 
     def ejecutar(self):
+        #Ejecucion de Creacion de Archivos en caso de no exisitr
         self.creacion_arvhivo_Presupuesto()
         self.creacion_archivo_integrantes()
         self.creacion_archivo_Categorias()
@@ -170,7 +173,7 @@ class Sistema_Presupuesto:
                         raise ValueError
                 except ValueError:
                     print('La opcion seleccionada no es valida, vuelvalo a intentar')
-            
+            #Implementacion funcionalidad de Padre y Madre son los unicos que puede modificar el presupuesto
             if opcion==1:
                 if self.usuario_actual.integrante not in ['Padre','Madre']:
                     print('Solo Padre o Madre pueden actualizar el presupuesto')
@@ -191,6 +194,7 @@ class Sistema_Presupuesto:
                 Sistema_Presupuesto.resumen_gastos(self)
             if opcion==6:
                 Sistema_Presupuesto.restante_presupuesto(self)
+            #Implementacion funcionalidad de Padre y Madre son los unicos que pueden registrar usuarios
             if opcion==7:
                 if self.usuario_actual.integrante not in ['Padre','Madre']:
                     print('Solo Padre o Madre pueden agregar Usuarios')
@@ -199,7 +203,8 @@ class Sistema_Presupuesto:
                     Usuario1.registrar_usuario()
             if opcion==8:
                 Usuario1=Usuario("","","")
-                Usuario1.actualizar_password()
+                Usuario1.actualizar_password(self.usuario_actual.username)
+            #Implementacion funcionalidad de Padre y Madre son los unicos que pueden eliminar usuarios
             if opcion==9:
                 if self.usuario_actual.integrante not in ['Padre','Madre']:
                     print('Solo Padre o Madre pueden eliminar Usuarios')

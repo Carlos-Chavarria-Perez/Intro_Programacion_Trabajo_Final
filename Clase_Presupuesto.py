@@ -8,6 +8,7 @@ class Presupuesto:
         self.presupuesto_mensaul=presupuesto_mensual
         self.arhivo_presupuesto='Presupuesto.csv'
     
+    #Funcionaliad de definir un presupuesto, recive Usarios actual, ya que solo Padre, o Madre pueden modificar el presupuesto 
     def registrar_Presupuesto(self,integrante): 
         presuesto_actual=0
 
@@ -17,11 +18,20 @@ class Presupuesto:
                 for fila in reader:
                     presuesto_actual=fila[0]
                 
-        actualizar=input(f'Desea Actualizar el presupuesto Actual de {presuesto_actual} Si/No').upper()
+        actualizar=input(f'Desea Actualizar el presupuesto Actual de {presuesto_actual} Si/No: ').upper()
         if actualizar=="SI":
             fecha=datetime.datetime.now()
             fecha_registro = fecha.strftime("%m/%Y")
-            self.presupuesto_mensual=int(input('Ingrese el presupuesto del mes')) 
+            while True:
+                try:
+                    self.presupuesto_mensual=int(input('Ingrese el presupuesto del mes: ')) 
+                    if self.presupuesto_mensual>0:
+                        break
+                    else:
+                        raise ValueError
+                except ValueError:
+                    print('No puede ingresar un presupuesto negativo')
+
             with open("Presupuesto.csv",mode="a",newline="") as archivoCSV:
                 writer=csv.writer(archivoCSV,delimiter=",")
                 writer.writerow([self.presupuesto_mensual,fecha_registro])
