@@ -2,6 +2,7 @@ import csv
 import os
 
 class Persona:
+    #Roles de integrante disponibles para registrar persoma
     roles_integrantes=['Padre','Madre','Hijo','Hija']
     def __init__(self,nombre,apellido,edad,integrante) -> None:
         self.nombre=nombre
@@ -10,10 +11,12 @@ class Persona:
         self.integrante=integrante
         self.lista_roles_validacion=[]
 
-    def reistro_Integrante(self):
+    #Registro de Ingregrante
+    def reistro_Integrante(self,username):
+        self.username= username
         while True:
             try:
-                self.nombre=input('Ingrese el nombre del miemrbo: ').strip().capitalize()
+                self.nombre=input('Ingrese el nombre del integrante: ').strip().capitalize()
                 if self.nombre.isalpha():
                     break
                 else:
@@ -22,7 +25,7 @@ class Persona:
                 print('No puede dejar el campo en blanco solo puede ingresar letras')
         while True:
             try:
-                self.apellido=input("Ingrese el apellido del cliente: ").strip().capitalize()
+                self.apellido=input("Ingrese el apellido: ").strip().capitalize()
                 if self.apellido.isalpha():
                     break
                 else:
@@ -58,8 +61,9 @@ class Persona:
         
         with open("Integrantes.csv",mode="a",newline="") as archivoCSV:
                 writer=csv.writer(archivoCSV,delimiter=",")
-                writer.writerow([self.nombre,self.apellido,self.edad,self.integrante])
-    
+                writer.writerow([self.username,self.nombre,self.apellido,self.edad,self.integrante])
+                
+    #Funcionaliad para poder ver todos los integrantes registrados
     def leer_Integrantes(self):
         with open("Integrantes.csv",mode="r",newline="") as archivoCSV:
             reader=csv.reader(archivoCSV,delimiter=",")

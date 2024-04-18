@@ -46,38 +46,85 @@ class Usuario(Persona):
              
         self.password= input('Defina su contraseña: ')
 
-        Persona.reistro_Integrante(self)
+        Persona.reistro_Integrante(self,self.username)
 
     
         with open("Usuarios.csv",mode="a",newline="") as archivoCSV:
             writer=csv.writer(archivoCSV,delimiter=",")
             writer.writerow([self.__username,self.__password,self.integrante])
 
-    def eliminar_usuario():
-        usuario_eliminar= input('Ingrese el usuario que desea eliminar: ')
-
-
-    def actualizar_password(self):
-        validador = input('Valide su contraseña Actual: ')
+    #Funcionliad de eliminar usuarios tanto del Archivo Usuarios como Integrantes
+    def eliminar_usuario(self):
         
-        # Read the data from the CSV file
+        with open('Usuarios.csv', mode="r") as archivoLecturaCSV:
+            reader = csv.reader(archivoLecturaCSV, delimiter=",")
+            next(reader)  
+            for fila in reader:
+                Usuario.lista_usuarios.append(fila[0])
+        
+        usuario_eliminar=input('Ingrese el Usuario que desea eliminar: ')
+        if usuario_eliminar not in Usuario.lista_usuarios:
+            print('El usuario que desea eliminar no existe en la base de datos')
+            return
+        lista_usuarios=[]
+        lista_integrantes=[]
+        
+        ##Eliminacion de Archivo de Usuarios
         with open("Usuarios.csv", mode="r") as archivoCSV:
             reader = csv.reader(archivoCSV, delimiter=",")
-            rows = list(reader)  # Convert reader object to a list of rows
+            header=next(reader)
+            for fila in reader:
+                if fila[0]!= usuario_eliminar:
+                    lista_usuarios.append(fila)
 
-        # Update the specific value based on user input
-        for fila in rows:
-            if fila[1] == validador:
-                nuevo_password = input('Defina su nueva contraseña: ')
-                fila[1] = nuevo_password
-                break
 
-        # Rewrite the entire CSV file with the updated data
         with open("Usuarios.csv", mode="w", newline="") as archivoCSV:
             writer = csv.writer(archivoCSV, delimiter=",")
+            writer.writerow(header)
+            writer.writerows(lista_usuarios)
+
+        ##Eliminacion de Archivo de Integrantes
+        with open("Integrantes.csv", mode="r") as archivoCSV:
+            reader = csv.reader(archivoCSV, delimiter=",")
+            header=next(reader)
+            for fila in reader:
+                if fila[0]!= usuario_eliminar:
+                    lista_integrantes.append(fila)
+
+
+        with open("Integrantes.csv", mode="w", newline="") as archivoCSV:
+            writer = csv.writer(archivoCSV, delimiter=",")
+            writer.writerow(header)
+            writer.writerows(lista_integrantes)
+
+        print(f'El usuario {usuario_eliminar} ha sido removido de lista de usuarios y de integrantes')
+
+
+
+
+    def actualizar_password(self,username):
+        print('Para Actualizar su contraseña por favor')
+        validador = input('Valide su contraseña Actual: ')
+        
+
+        with open("Usuarios.csv", mode="r") as archivoCSV:
+            reader = csv.reader(archivoCSV, delimiter=",")
+            header=next(reader)
+            rows = list(reader)  
+
+        for fila in rows:
+            if fila[0] == username and fila[1] == validador:
+                nuevo_password = input('Defina su nueva contraseña: ')
+                fila[1] = nuevo_password
+                print("Contraseña actualizada con éxito.")
+                break
+        else:
+            print("Contraseña incorrecta.")
+            return
+
+    
+        with open("Usuarios.csv", mode="w", newline="") as archivoCSV:
+            writer = csv.writer(archivoCSV, delimiter=",")
+            writer.writerow(header)
             writer.writerows(rows)
 
-        if any(fila[1] == nuevo_password for fila in rows):
-            print("Contraseña actualizada con éxito.")
-        else:
-            print("La contraseña actual no coincide con ningún usuario.")

@@ -11,6 +11,7 @@ class Gastos(Categoria):
         self.integrante=integrante
         self.leer_categorias()
 
+    #Funcionalidad de regirar gastos, recibe el usuario actual al momento de escribir el gasto en el CSV herada el rol integrante
     def registro_Gasto(self,usuario_actual):
 
         print('Estas son las Categorias registradas actualmente')

@@ -7,6 +7,7 @@ class Categoria:
     def __init__(self,categoria) -> None:
         self.categoria=categoria
 
+    #Class method para poder accer a la lista de Categrias
     @classmethod
     def leer_categorias(cls):
         cls.lista_categorias.clear()
@@ -20,6 +21,7 @@ class Categoria:
             for fila in reader:
                 Categoria.lista_categorias.append(fila[0])
 
+    #Funcionalidad de crear categorias
     def registrar_categoria(self):
         self.leer_categorias()
         while True:
