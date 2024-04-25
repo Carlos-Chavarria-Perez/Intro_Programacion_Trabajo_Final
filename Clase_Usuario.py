@@ -36,7 +36,7 @@ class Usuario(Persona):
  
         while True:
             try:
-                self.__username= input('Define el usuario: ')
+                self.__username= input('Defina el usuario: ')
                 if self.__username in Usuario.lista_usuarios:
                     raise ValueError
                 else:

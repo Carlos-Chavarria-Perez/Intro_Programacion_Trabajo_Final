@@ -16,7 +16,7 @@ class Categoria:
             try:
                 next(reader)
             except StopIteration:
-                print('El archivo esta vacio')
+                print('El archivo esta vacío')
 
             for fila in reader:
                 Categoria.lista_categorias.append(fila[0])

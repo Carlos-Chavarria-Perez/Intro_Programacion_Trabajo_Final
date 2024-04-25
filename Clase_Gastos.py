@@ -42,7 +42,7 @@ class Gastos(Categoria):
                 else:
                     raise ValueError
             except ValueError:
-                print('No puede ingresar numeros negativos ni letras')
+                print('No puede ingresar números negativos ni letras')
 
         while True:
             meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
