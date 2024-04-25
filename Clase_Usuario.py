@@ -37,12 +37,14 @@ class Usuario(Persona):
         while True:
             try:
                 self.__username= input('Define el usuario: ')
-                if self.__username in Usuario.lista_usuarios:
+                if not self.__username.strip():
+                    raise ValueError
+                elif self.__username in Usuario.lista_usuarios:
                     raise ValueError
                 else:
                     break
             except ValueError:
-                print('Usuario ya existe')
+                print('El campo no puede estar en blanco o el usuario ya existe')
              
         self.password= input('Defina su contraseña: ')
 

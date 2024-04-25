@@ -128,7 +128,7 @@ class Sistema_Presupuesto:
                     usuario_encontrado= True
             #Funcionalidad de crear usuario cuando se ejecuta por primera ver el codigo no existen Usarios registrados
             if not usuario_encontrado:
-                print('No existen usuarios actualmente, por favor registre un usuario')
+                print('No existen usuarios actualmente, por favor registre un usuario, Padre o Madre deben ser los primero roles asignados')
                 Usuario1=Usuario("","","")
                 Usuario1.registrar_usuario()    
     

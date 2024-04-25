@@ -26,6 +26,7 @@ class Presupuesto:
                 try:
                     self.presupuesto_mensual=int(input('Ingrese el presupuesto del mes: ')) 
                     if self.presupuesto_mensual>0:
+                        print(f'El presupuesto ha sido actualziado a {self.presupuesto_mensual}')
                         break
                     else:
                         raise ValueError
@@ -35,3 +36,4 @@ class Presupuesto:
             with open("Presupuesto.csv",mode="a",newline="") as archivoCSV:
                 writer=csv.writer(archivoCSV,delimiter=",")
                 writer.writerow([self.presupuesto_mensual,fecha_registro])
+        
