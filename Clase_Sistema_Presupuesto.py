@@ -27,7 +27,7 @@ class Sistema_Presupuesto:
         if not os.path.exists(self.arhivo_presupuesto):
             with open("Presupuesto.csv",mode="w",newline="") as archivoCSV:
                 writer=csv.writer(archivoCSV,delimiter=",")
-                writer.writerow(['Presupuesto','Fecha de Modificacion'])
+                writer.writerow(['Presupuesto','Fecha de Modificación'])
     
     def creacion_archivo_Gastos(self):
         if not os.path.exists(self.arhivo_gastos):
@@ -87,7 +87,7 @@ class Sistema_Presupuesto:
                 else:
                     raise ValueError
             except ValueError:
-                print('Esa no es una opcion valida')
+                print('Esa no es una opción válida')
     #Calculo de presupuesto restante
     def restante_presupuesto(self):
         presupuesto_actual=0
@@ -102,7 +102,7 @@ class Sistema_Presupuesto:
         resulatdo=presupuesto_actual-total_gastado
 
         if resulatdo>0:
-            print(f'El presuesto restante es de \033[92m{resulatdo} esta dentro del presupuesto')
+            print(f'El presupuesto restante es de \033[92m{resulatdo} esta dentro del presupuesto')
         if resulatdo<0:
             print(f'El presupuesto restante es de \033[0;31m {resulatdo} esta por encima del presupuesto')
         
@@ -132,7 +132,7 @@ class Sistema_Presupuesto:
                 Usuario1=Usuario("","","")
                 Usuario1.registrar_usuario()    
     
-            print("Usuario no valido o contraseña no válida. Inténtelo de nuevo.")
+            print("Usuario no válido o contraseña no válida. Inténtelo de nuevo.")
             print()
     
 
@@ -157,22 +157,22 @@ class Sistema_Presupuesto:
                 2) Consultar integrantes Actuales
                 3) Ingresar un nuevo gasto
                 4) Ingresar una nueva categoria de gasto
-                5) Mostrar Graficos de gastos
+                5) Mostrar Gráficos de gastos
                 6) Consultar presupuesto restante
                 7) Registrar usuario
-                8) Actaulizar contaseña
+                8) Actualizar contaseña
                 9) Eliminar Usuario
                 ''')
 
             while True:
                 try:
-                    opcion=int(input('Eliga un opcion: '))
+                    opcion=int(input('Eliga un opción: '))
                     if opcion in lista_opciones:
                         break
                     else:
                         raise ValueError
                 except ValueError:
-                    print('La opcion seleccionada no es valida, vuelvalo a intentar')
+                    print('La opción seleccionada no es válida, vuelvalo a intentar')
             #Implementacion funcionalidad de Padre y Madre son los unicos que puede modificar el presupuesto
             if opcion==1:
                 if self.usuario_actual.integrante not in ['Padre','Madre']:
@@ -213,13 +213,13 @@ class Sistema_Presupuesto:
                     Usuario1.eliminar_usuario()
             while True:
                 try:
-                    salir=input('\033[0;37mDesea salir del programa de presuspuesto Si/No?: ').upper()
+                    salir=input('\033[0;37mDesea salir del programa de presupuesto Si/No?: ').upper()
                     if salir.upper()=="SI" or salir.upper()=="NO":
                         break
                     else:
                         raise ValueError
                 except:
                     ValueError
-                    print('Esa no es una opcion valida')
+                    print('Esa no es una opcion válida')
 
 

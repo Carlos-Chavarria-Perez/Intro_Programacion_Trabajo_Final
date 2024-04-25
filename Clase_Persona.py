@@ -57,7 +57,7 @@ class Persona:
                 else:
                     raise ValueError
             except ValueError:
-                print('El rol que intenta no es una opcion disponible, o el role ya esta asignado')
+                print('El rol que intenta no es una opción disponible, o el rol ya está asignado')
         
         with open("Integrantes.csv",mode="a",newline="") as archivoCSV:
                 writer=csv.writer(archivoCSV,delimiter=",")
